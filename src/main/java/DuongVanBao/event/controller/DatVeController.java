@@ -5,6 +5,7 @@ import DuongVanBao.event.dto.response.DatVeResponse;
 import DuongVanBao.event.dto.response.ErrorResponse;
 import DuongVanBao.event.dto.response.EventResponse;
 import DuongVanBao.event.dto.response.SuccessResponse;
+import DuongVanBao.event.dto.search.DatVeSearchAdmin;
 import DuongVanBao.event.model.entity.DatVe;
 import DuongVanBao.event.model.entity.LoaiVe;
 import DuongVanBao.event.model.entity.SuKien;
@@ -12,6 +13,7 @@ import DuongVanBao.event.model.entity.Ve;
 import DuongVanBao.event.service.DatVeService;
 import DuongVanBao.event.service.LoaiVeService;
 import DuongVanBao.event.service.VeService;
+import DuongVanBao.event.service.impl.ThanhToanService;
 import DuongVanBao.event.util.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,7 @@ public class DatVeController {
     private final LoaiVeService loaiVeService;
     private final VeService veService;
     private static final int BOOKING_EXPIRATION_MINUTES = 15;
+    private final ThanhToanService thanhToanService;
 
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("")
@@ -128,6 +131,44 @@ public class DatVeController {
         return ResponseEntity.ok(SuccessResponse.withData(responses));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/search")
+    public ResponseEntity<?> findAll(Pageable pageable, @RequestBody(required = false) DatVeSearchAdmin request) {
+        if (request.getTrangThai() != null) {
+            switch(request.getTrangThai()) {
+                case "CHO_THANH_TOAN":
+                    request.setHoatDong(false);
+                    request.setIsExpired(false);
+                    break;
+                case "DA_THANH_TOAN":
+                    request.setHoatDong(true);
+                    break;
+                case "HET_HAN":
+                    request.setHoatDong(false);
+                    request.setIsExpired(true);
+                    break;
+                default:
+                    throw new RuntimeException("Lỗi đường dẫn");
+            };
+        }
+        Page<DatVeResponse> responses = datVeService.findPageFilterAdmin(pageable, request)
+                .map(this::toDatVeResponse);
+        return ResponseEntity.ok(SuccessResponse.withData(responses));
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Transactional
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable String id) {
+        DatVe datVe = datVeService.findById(id).orElseThrow(() ->
+                new RuntimeException("Không tìm thấy đặt vé này"));
+
+        veService.deleteByDatVe(datVe);
+        thanhToanService.deleteByDatVe(datVe);
+        datVeService.deleteById(id);
+        return ResponseEntity.ok(SuccessResponse.withMessage(null, "Xóa thành công"));
+    }
+
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable String id) {
@@ -192,6 +233,13 @@ public class DatVeController {
                 .collect(Collectors.toList());
 
         response.setChiTietVes(chiTietVes);
+
+        DatVeResponse.NguoiDungResponse khachHang = new DatVeResponse.NguoiDungResponse();
+        khachHang.setMaNguoiDung(datVe.getKhachHang().getMaNguoiDung());
+        khachHang.setTenHienThi(datVe.getKhachHang().getTenHienThi());
+        khachHang.setEmail(datVe.getKhachHang().getEmail());
+
+        response.setKhachHang(khachHang);
 
         return response;
     }

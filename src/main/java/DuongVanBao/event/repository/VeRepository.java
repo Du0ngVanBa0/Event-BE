@@ -14,4 +14,5 @@ public interface VeRepository extends JpaRepository<Ve, String> {
     List<Ve> findByLoaiVe(LoaiVe loaiVe);
     long countByLoaiVe(LoaiVe loaiVe);
     List<Ve> findByLoaiVe_MaLoaiVe(String maLoaiVe);
+    void deleteByDatVe(DatVe datVe);
 }

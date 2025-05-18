@@ -193,6 +193,25 @@ public class ThanhToanService {
         return response;
     }
 
+    public void deleteByDatVe(DatVe datVe) {
+        thanhToanRepository.deleteByDatVe(datVe);
+    }
+
+    public static Map<String, String> parseVNPayParams(Map<String, String> rawParams) {
+        Map<String, String> parsedParams = new HashMap<>();
+
+        for (String entry : rawParams.values()) {
+            int equalIndex = entry.indexOf('=');
+            if (equalIndex > 0) {
+                String key = entry.substring(0, equalIndex);
+                String value = entry.substring(equalIndex + 1);
+                parsedParams.put(key, value);
+            }
+        }
+
+        return parsedParams;
+    }
+
     private String getResponseDescription(String responseCode) {
         Map<String, String> responseDescriptions = new HashMap<>();
         responseDescriptions.put("00", "Giao dịch thành công");
@@ -216,21 +235,6 @@ public class ThanhToanService {
         responseDescriptions.put("99", "Các lỗi khác");
 
         return responseDescriptions.getOrDefault(responseCode, "Lỗi không xác định");
-    }
-
-    public static Map<String, String> parseVNPayParams(Map<String, String> rawParams) {
-        Map<String, String> parsedParams = new HashMap<>();
-
-        for (String entry : rawParams.values()) {
-            int equalIndex = entry.indexOf('=');
-            if (equalIndex > 0) {
-                String key = entry.substring(0, equalIndex);
-                String value = entry.substring(equalIndex + 1);
-                parsedParams.put(key, value);
-            }
-        }
-
-        return parsedParams;
     }
 
     private boolean verifySignature(Map<String, String> vnpParams, String secureHash) {
