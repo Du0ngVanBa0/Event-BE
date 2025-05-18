@@ -1,7 +1,5 @@
 package DuongVanBao.event.dto.response;
 
-import DuongVanBao.event.model.entity.DiaDiem;
-import DuongVanBao.event.model.entity.NguoiDung;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -20,6 +18,7 @@ public class DatVeResponse {
     private EventResponseInTicket suKien;
     private List<ChiTietVeResponse> chiTietVes;
     private List<ThanhToanResponse> thanhToans;
+    private NguoiDungResponse khachHang;
 
     @Data
     public static class ChiTietVeResponse {
@@ -54,6 +53,7 @@ public class DatVeResponse {
     public static class NguoiDungResponse {
         private String maNguoiDung;
         private String tenHienThi;
+        private String email;
     }
 
     @Data

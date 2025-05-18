@@ -193,6 +193,13 @@ public class DatVeController {
 
         response.setChiTietVes(chiTietVes);
 
+        DatVeResponse.NguoiDungResponse khachHang = new DatVeResponse.NguoiDungResponse();
+        khachHang.setMaNguoiDung(datVe.getKhachHang().getMaNguoiDung());
+        khachHang.setTenHienThi(datVe.getKhachHang().getTenHienThi());
+        khachHang.setEmail(datVe.getKhachHang().getEmail());
+
+        response.setKhachHang(khachHang);
+
         return response;
     }
 }
