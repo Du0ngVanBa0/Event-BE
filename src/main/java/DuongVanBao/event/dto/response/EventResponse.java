@@ -45,6 +45,8 @@ public class EventResponse extends BaseModel {
         private String tenLoaiVe;
         private String moTa;
         private Integer soLuong;
+        private Integer soLuongToiThieu;
+        private Integer soLuongToiDa;
         private Integer veConLai;
         private BigDecimal giaTien;
     }
