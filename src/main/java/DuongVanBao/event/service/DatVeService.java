@@ -1,5 +1,6 @@
 package DuongVanBao.event.service;
 
+import DuongVanBao.event.dto.search.DatVeSearchAdmin;
 import DuongVanBao.event.model.entity.DatVe;
 import DuongVanBao.event.model.entity.NguoiDung;
 import org.springframework.data.domain.Page;
@@ -10,4 +11,5 @@ import java.util.List;
 public interface DatVeService extends BaseService<DatVe, String> {
     List<DatVe> findByKhachHang(NguoiDung khachHang);
     Page<DatVe> findAllFilter(Pageable pageable, String maNguoiDung, Boolean hoatDong, Boolean isTimeExpired);
+    Page<DatVe> findPageFilterAdmin(Pageable pageable, DatVeSearchAdmin datVeSearchAdmin);
 }

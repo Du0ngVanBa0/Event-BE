@@ -1,5 +1,6 @@
 package DuongVanBao.event.service.impl;
 
+import DuongVanBao.event.dto.search.DatVeSearchAdmin;
 import DuongVanBao.event.model.entity.DatVe;
 import DuongVanBao.event.model.entity.NguoiDung;
 import DuongVanBao.event.repository.DatVeRepository;
@@ -47,4 +48,39 @@ public class DatVeServiceImpl extends BaseServiceImpl<DatVe, String> implements 
 
         return datVeRepository.findAll(specification, pageable);
     }
+
+    @Override
+    public Page<DatVe> findPageFilterAdmin(Pageable pageable, DatVeSearchAdmin datVeSearchAdmin) {
+        Specification<DatVe> specification = Specification.where(null);
+        if (datVeSearchAdmin.getMaDatVe() != null) {
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("maDatVe"), datVeSearchAdmin.getMaDatVe()));
+        }
+        if (datVeSearchAdmin.getMaKhachHang() != null) {
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.like(root.join("khachHang").get("maNguoiDung"), datVeSearchAdmin.getMaKhachHang()));
+        }
+        if (datVeSearchAdmin.getHoatDong() != null) {
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("hoatDong"),datVeSearchAdmin.getHoatDong()));
+        }
+        if (datVeSearchAdmin.getIsExpired() != null) {
+            if (!datVeSearchAdmin.getIsExpired()) {
+                specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.greaterThan(root.get("thoiGianHetHan"), LocalDateTime.now()));
+            } else {
+                specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(root.get("thoiGianHetHan"), LocalDateTime.now()));
+            }
+        }
+        if (datVeSearchAdmin.getFromDate() != null) {
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(root.get("ngayTao"), datVeSearchAdmin.getFromDate()));
+        }
+        if (datVeSearchAdmin.getToDate() != null) {
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(root.get("ngayTao"), datVeSearchAdmin.getToDate()));
+        }
+        if (datVeSearchAdmin.getFromMoney() != null) {
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.greaterThanOrEqualTo(root.get("tongTien"), datVeSearchAdmin.getFromMoney()));
+        }
+        if (datVeSearchAdmin.getToMoney() != null) {
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.lessThanOrEqualTo(root.get("tongTien"), datVeSearchAdmin.getToMoney()));
+        }
+        return datVeRepository.findAll(specification, pageable);
+    }
+
 }

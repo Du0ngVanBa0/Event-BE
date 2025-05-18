@@ -12,4 +12,5 @@ public interface VeService extends BaseService<Ve, String> {
     long countByDatVe(LoaiVe loaiVe);
     List<Ve> findByLoaiVe_MaLoaiVe(String maLoaiVe);
     Integer calculateReservedTickets(String maLoaiVe);
+    void deleteByDatVe(DatVe datVe);
 }

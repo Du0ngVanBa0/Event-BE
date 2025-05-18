@@ -53,4 +53,9 @@ public class VeServiceImpl extends BaseServiceImpl<Ve, String> implements VeServ
                 })
                 .count();
     }
+
+    @Override
+    public void deleteByDatVe(DatVe datVe) {
+        veRepository.deleteByDatVe(datVe);
+    }
 }

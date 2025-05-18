@@ -20,4 +20,6 @@ public interface ThanhToanRepository extends JpaRepository<ThanhToan, String> {
         List<ThanhToan> thanhToans = findByDatVeAndPhuongThucOrderByTimeDesc(datVe, phuongThuc);
         return thanhToans.isEmpty() ? Optional.empty() : Optional.of(thanhToans.get(0));
     }
+
+    void deleteByDatVe(DatVe datVe);
 }
