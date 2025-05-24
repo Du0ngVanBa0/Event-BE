@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -14,17 +15,17 @@ public class EventRequest {
     private String tieuDe;
     private String moTa;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private Date thoiGianBatDau;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime thoiGianBatDau;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private Date thoiGianKetThuc;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime thoiGianKetThuc;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private Date ngayMoBanVe;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime ngayMoBanVe;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private Date ngayDongBanVe;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", iso = DateTimeFormat.ISO.DATE_TIME)
+    private LocalDateTime ngayDongBanVe;
 
     private MultipartFile anhBia;
     private String tenDiaDiem;
