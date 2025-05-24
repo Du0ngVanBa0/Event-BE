@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Set;
 
@@ -29,17 +30,17 @@ public class SuKien extends BaseModel {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    private Date thoiGianBatDau;
+    private LocalDateTime thoiGianBatDau;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    private Date thoiGianKetThuc;
+    private LocalDateTime thoiGianKetThuc;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date ngayMoBanVe;
+    private LocalDateTime ngayMoBanVe;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date ngayDongBanVe;
+    private LocalDateTime ngayDongBanVe;
 
     private String anhBia;
 
