@@ -2,6 +2,8 @@ package DuongVanBao.event.dto.response;
 
 import DuongVanBao.event.model.BaseModel;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.math.BigDecimal;
@@ -11,10 +13,10 @@ public class EventResponse extends BaseModel {
     private String maSuKien;
     private String tieuDe;
     private String moTa;
-    private Date thoiGianBatDau;
-    private Date thoiGianKetThuc;
-    private Date ngayMoBanVe;
-    private Date ngayDongBanVe;
+    private LocalDateTime thoiGianBatDau;
+    private LocalDateTime thoiGianKetThuc;
+    private LocalDateTime ngayMoBanVe;
+    private LocalDateTime ngayDongBanVe;
     private String anhBia;
     private boolean hoatDong;
     private DiaDiemResponse diaDiem;
