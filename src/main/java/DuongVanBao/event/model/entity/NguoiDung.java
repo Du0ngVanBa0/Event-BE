@@ -21,10 +21,10 @@ public class NguoiDung extends BaseModel implements UserDetails {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String maNguoiDung;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String tenNguoiDung;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -35,6 +35,8 @@ public class NguoiDung extends BaseModel implements UserDetails {
 
     private String tenHienThi;
     private String anhDaiDien;
+
+    private boolean hoatDong = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

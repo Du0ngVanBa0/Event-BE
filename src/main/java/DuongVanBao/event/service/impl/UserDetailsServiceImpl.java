@@ -14,9 +14,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private final NguoiDungRepository nguoiDungRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return nguoiDungRepository.findByEmail(email)
+    public UserDetails loadUserByUsername(String maNguoiDung) throws UsernameNotFoundException {
+        return nguoiDungRepository.findByMaNguoiDung(maNguoiDung)
                 .map(UserDetailsImpl::new)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng"));
     }
 }

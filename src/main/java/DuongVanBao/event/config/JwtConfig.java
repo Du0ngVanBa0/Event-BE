@@ -82,6 +82,7 @@ public class JwtConfig {
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof NguoiDung nguoiDung) {
             claims.put("maNguoiDung", nguoiDung.getMaNguoiDung());
+            claims.put("email", nguoiDung.getEmail());
             claims.put("tenNguoiDung", nguoiDung.getTenNguoiDung());
             claims.put("tenHienThi", nguoiDung.getTenHienThi());
             claims.put("vaiTro", nguoiDung.getVaiTro().name());
@@ -101,8 +102,8 @@ public class JwtConfig {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String email = extractEmail(token);
-        return (email.equals(userDetails.getUsername())) && !isTokenExpired(token);
+        final String maNguoiDung = extractMaNguoiDung(token);
+        return (maNguoiDung.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
