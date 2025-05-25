@@ -40,10 +40,10 @@ public class DatVeResponse {
         private String maSuKien;
         private String tieuDe;
         private String anhBia;
-        private Date thoiGianBatDau;
-        private Date thoiGianKetThuc;
-        private Date ngayMoBanVe;
-        private Date ngayDongBanVe;
+        private LocalDateTime thoiGianBatDau;
+        private LocalDateTime thoiGianKetThuc;
+        private LocalDateTime ngayMoBanVe;
+        private LocalDateTime ngayDongBanVe;
         private EventResponse.DiaDiemResponse diaDiem;
         private boolean hoatDong;
         private NguoiDungResponse nguoiToChuc;

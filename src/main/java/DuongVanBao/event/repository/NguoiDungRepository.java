@@ -8,6 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface NguoiDungRepository extends JpaRepository<NguoiDung, String> {
-    Optional<NguoiDung> findByEmail(String email);
-    boolean existsByEmail(String email);
+    Optional<NguoiDung> findByMaNguoiDung(String maNguoiDung);
+    Optional<NguoiDung> findByEmailAndHoatDong(String email, boolean hoatDong);
 }
