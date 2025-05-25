@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface OtpRepository extends JpaRepository<Otp, String> {
     Optional<Otp> findByMaOtp(String maOtp);
+    void deleteAllByNguoiDungMaNguoiDung(String maNguoiDung);
 }

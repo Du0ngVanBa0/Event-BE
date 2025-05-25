@@ -56,7 +56,7 @@ public class DatVeServiceImpl extends BaseServiceImpl<DatVe, String> implements 
             specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("maDatVe"), datVeSearchAdmin.getMaDatVe()));
         }
         if (datVeSearchAdmin.getMaKhachHang() != null) {
-            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.like(root.join("khachHang").get("maNguoiDung"), datVeSearchAdmin.getMaKhachHang()));
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.like(root.join("khachHang").get("maNguoiDung"), "%" + datVeSearchAdmin.getMaKhachHang() + "%"));
         }
         if (datVeSearchAdmin.getHoatDong() != null) {
             specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("hoatDong"),datVeSearchAdmin.getHoatDong()));
