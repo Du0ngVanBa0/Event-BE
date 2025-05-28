@@ -16,7 +16,7 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: testpassword
-          MYSQL_DATABASE: event_test
+          MYSQL_DATABASE: event
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
