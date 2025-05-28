@@ -80,13 +80,13 @@ jobs:
     steps:
       - name: 🎉 Deploy Success
         run: |
-          echo "🎉 Build thành công!"
-          echo "🚀 Render đang deploy ứng dụng..."
-          echo "🌐 Ứng dụng sẽ có tại: https://event-app-du0ngvanbao.onrender.com"
-          echo "⏰ Thời gian deploy: 5-10 phút"
-          echo "🔍 Health check: https://event-app-du0ngvanbao.onrender.com/actuator/health"
+          echo "Build thành công!"
+          echo "Render đang deploy ứng dụng..."
+          echo "Ứng dụng sẽ có tại: https://event-be-d0p6.onrender.com"
+          echo "Thời gian deploy: 5-10 phút"
+          echo "Health check: https://event-be-d0p6.onrender.com/actuator/health"
           echo ""
-          echo "📋 Các endpoint quan trọng:"
-          echo "- API Base: https://event-app-du0ngvanbao.onrender.com"
-          echo "- Health: https://event-app-du0ngvanbao.onrender.com/actuator/health"
-          echo "- Info: https://event-app-du0ngvanbao.onrender.com/actuator/info"
+          echo "Các endpoint quan trọng:"
+          echo "- API Base: https://event-be-d0p6.onrender.com"
+          echo "- Health:https://event-be-d0p6.onrender.com/actuator/health"
+          echo "- Info: https://event-be-d0p6.onrender.com/actuator/info"
