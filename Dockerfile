@@ -2,8 +2,8 @@ FROM gradle:8.5-jdk17 AS build
 
 WORKDIR /app
 
-COPY build.gradlew settings.gradlew ./
-COPY gradlew gradlew
+COPY build.gradle.kts settings.gradle.kts ./
+COPY gradlew ./
 COPY gradlew ./
 
 COPY src src
