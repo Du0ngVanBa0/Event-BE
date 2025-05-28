@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY build.gradle.kts settings.gradle.kts ./
 COPY gradlew ./
-COPY gradlew ./
+COPY gradle ./
 
 COPY src src
 
