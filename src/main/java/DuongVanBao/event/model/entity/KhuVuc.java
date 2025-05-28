@@ -10,7 +10,7 @@ import java.util.Set;
 @Table(name = "KHUVUC")
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true, exclude = {"loaiVes"})
+@EqualsAndHashCode(callSuper = true, exclude = {"loaiVes", "suKien"})
 @ToString(callSuper = true, exclude = {"loaiVes"})
 public class KhuVuc extends BaseModel {
     @Id
@@ -31,4 +31,8 @@ public class KhuVuc extends BaseModel {
 
     @OneToMany(mappedBy = "khuVuc")
     private Set<LoaiVe> loaiVes;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "maSuKien")
+    private SuKien suKien;
 }

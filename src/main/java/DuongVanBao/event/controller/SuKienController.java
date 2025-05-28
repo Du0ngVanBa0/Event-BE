@@ -1,8 +1,10 @@
 package DuongVanBao.event.controller;
 
 import DuongVanBao.event.dto.request.EventRequest;
+import DuongVanBao.event.dto.request.KhuVucRequest;
 import DuongVanBao.event.dto.request.LoaiVeRequest;
 import DuongVanBao.event.dto.response.EventResponse;
+import DuongVanBao.event.dto.response.KhuVucResponse;
 import DuongVanBao.event.dto.response.SuccessResponse;
 import DuongVanBao.event.model.entity.*;
 import DuongVanBao.event.repository.KhuVucRepository;
@@ -93,7 +95,8 @@ public class SuKienController implements BaseController<EventRequest, String> {
         
         SuKien suKien = createSuKien(request);
         createDanhMucLinks(suKien, request.getMaDanhMucs());
-        createLoaiVes(suKien, request.getLoaiVes());
+        List<KhuVuc> khuVucs = createKhuVucs(suKien, request.getKhuVucs());
+        createLoaiVes(suKien, request.getLoaiVes(), khuVucs);
 
         return ResponseEntity.ok(SuccessResponse.withData(toEventResponse(suKien)));
     }
@@ -168,6 +171,7 @@ public class SuKienController implements BaseController<EventRequest, String> {
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
     @Override
+    @Transactional
     public ResponseEntity<?> delete(String id) {
         SuKien suKien = suKienService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sự kiện"));
@@ -180,6 +184,7 @@ public class SuKienController implements BaseController<EventRequest, String> {
 
         lienKetService.deleteBySuKienId(suKien.getMaSuKien());
         loaiVeService.deleteAllBySuKien(suKien);
+        khuVucRepository.deleteAllBySuKien(suKien);
         suKienService.deleteById(id);
         diaDiemService.deleteById(suKien.getDiaDiem().getMaDiaDiem());
 
@@ -234,6 +239,31 @@ public class SuKienController implements BaseController<EventRequest, String> {
         }
     }
 
+    private List<KhuVuc> createKhuVucs(SuKien suKien, List<KhuVucRequest> khuVucRequests) {
+        if (khuVucRequests == null || khuVucRequests.isEmpty()) {
+            KhuVuc defaultKhuVuc = new KhuVuc();
+            defaultKhuVuc.setTenKhuVuc("Khu vực mặc định");
+            defaultKhuVuc.setViTri("Mặc định");
+            defaultKhuVuc.setMoTa("Khu vực mặc định cho sự kiện");
+            defaultKhuVuc.setLayoutData("{}");
+            defaultKhuVuc.setSuKien(suKien);
+            return List.of(khuVucRepository.save(defaultKhuVuc));
+        }
+
+        return khuVucRequests.stream()
+                .map(request -> {
+                    KhuVuc khuVuc = new KhuVuc();
+                    khuVuc.setTenKhuVuc(request.getTenKhuVuc());
+                    khuVuc.setMoTa(request.getMoTa());
+                    khuVuc.setViTri(request.getViTri());
+                    khuVuc.setLayoutData(request.getLayoutData());
+                    khuVuc.setSuKien(suKien);
+                    khuVuc.setMaKhuVuc(request.getTempId());
+                    return khuVucRepository.save(khuVuc);
+                })
+                .collect(Collectors.toList());
+    }
+
     private SuKien createSuKien(EventRequest request) {
         DiaDiem diaDiem = createDiaDiem(request);
         
@@ -282,14 +312,26 @@ public class SuKienController implements BaseController<EventRequest, String> {
         });
     }
 
-    private void createLoaiVes(SuKien suKien, List<LoaiVeRequest> loaiVes) {
+    private void createLoaiVes(SuKien suKien, List<LoaiVeRequest> loaiVes, List<KhuVuc> khuVucs) {
         if (loaiVes != null) {
             loaiVes.forEach(request -> {
                 LoaiVe loaiVe = new LoaiVe();
-                BeanUtils.copyProperties(request, loaiVe);
                 loaiVe.setSuKien(suKien);
-                KhuVuc kv = khuVucRepository.findById("1").get();
-                loaiVe.setKhuVuc(kv);
+                loaiVe.setTenLoaiVe(request.getTenLoaiVe());
+                loaiVe.setMoTa(request.getMoTa());
+                loaiVe.setSoLuong(request.getSoLuong());
+                loaiVe.setSoLuongToiThieu(request.getSoLuongToiThieu());
+                loaiVe.setSoLuongToiDa(request.getSoLuongToiDa());
+                loaiVe.setGiaTien(request.getGiaTien());
+
+                KhuVuc khuVuc = khuVucs.stream()
+                        .filter(zone -> zone.getMaKhuVuc().equals(request.getMaKhuVuc()) ||
+                                (zone.getLayoutData() != null &&
+                                        zone.getLayoutData().contains(request.getMaKhuVuc())))
+                        .findFirst()
+                        .orElse(khuVucs.isEmpty() ? null : khuVucs.get(0));
+
+                loaiVe.setKhuVuc(khuVuc);
                 loaiVeService.save(loaiVe);
             });
         }
@@ -335,6 +377,16 @@ public class SuKienController implements BaseController<EventRequest, String> {
             .collect(Collectors.toList());
         response.setLoaiVes(loaiVeList);
 
+        List<KhuVucResponse> khuVucList = khuVucRepository.findAllBySuKien(suKien)
+                .stream()
+                .map(khuVuc -> {
+                    KhuVucResponse khuVucResponse = new KhuVucResponse();
+                    BeanUtils.copyProperties(khuVuc, khuVucResponse);
+                    khuVucResponse.setTempId(khuVuc.getMaKhuVuc());
+                    return khuVucResponse;
+                })
+                .collect(Collectors.toList());
+        response.setKhuVucs(khuVucList);
         return response;
     }
 }

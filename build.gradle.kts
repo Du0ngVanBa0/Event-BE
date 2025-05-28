@@ -36,12 +36,17 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-mail:3.4.4")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
 	implementation("io.github.cdimascio:java-dotenv:5.2.2")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 	implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
+}
+
+tasks.jar {
+	enabled = false
 }
 
 tasks.withType<Test> {
