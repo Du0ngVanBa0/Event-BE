@@ -2,8 +2,8 @@ FROM gradle:8.5-jdk17 AS build
 
 WORKDIR /app
 
-COPY build.gradle settings.gradle ./
-COPY gradle gradle
+COPY build.gradlew settings.gradlew ./
+COPY gradlew gradlew
 COPY gradlew ./
 
 COPY src src
