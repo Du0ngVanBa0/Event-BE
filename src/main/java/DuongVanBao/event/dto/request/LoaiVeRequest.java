@@ -11,4 +11,5 @@ public class LoaiVeRequest {
     private Integer soLuongToiThieu;
     private Integer soLuongToiDa;
     private BigDecimal giaTien;
+    private String maKhuVuc;
 }

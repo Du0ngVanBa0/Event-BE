@@ -1,0 +1,93 @@
+name: Event App CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-build:
+    name: 🧪 Test và Build
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testpassword
+          MYSQL_DATABASE: event
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Run tests
+        env:
+          DB_USERNAME: root
+          DB_PASSWORD: testpassword
+          MAIL_USERNAME: test@example.com
+          MAIL_PASSWORD: testpassword
+          MAIL_NAME: "Universe Event"
+          JWT_SECRET: Testnehendsnndawesjoijoewjdojewfiojoijoi3ji3j8i9382u89892fceuiwhhuhu329832ujruj98uj8Emiliandsnndawesjoijoewjdojewfiojoijoi3ji3j8i9382u89892fceuiwhhuhu329832ujruj98uj8Emiliandsnndawesjoijoewjdojewfiojoijoi3ji3j8i9382u89892fceuiwhhuhu329832ujruj98uj8Emiliandsnndawesjoijoewjdojewfiojoijoi3ji3j8i9382u89892fceuiwhhuhu329832ujruj98uj8
+          VNPAY_TMN_CODE: test
+          VNPAY_HASH_SECRET: test
+        run: |
+          while ! mysqladmin ping -h127.0.0.1 -P3306 -uroot -ptestpassword --silent; do
+            echo "Waiting for MySQL..."
+            sleep 2
+          done
+          ./gradlew test --info
+
+      - name: Build JAR
+        run: ./gradlew bootJar --info
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: event-app-jar
+          path: build/libs/*.jar
+          retention-days: 1
+
+      - name: Test Docker build
+        run: |
+          echo "Testing Docker build..."
+          docker build -t event-app .
+          echo "Docker build successful!"
+
+  deploy-notification:
+    name: Deploy Notification
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: 🎉 Deploy Success
+        run: |
+          echo "Build thành công!"
+          echo "Render đang deploy ứng dụng..."
+          echo "Ứng dụng sẽ có tại: https://event-be-d0p6.onrender.com"
+          echo "Thời gian deploy: 5-10 phút"
+          echo "Health check: https://event-be-d0p6.onrender.com/actuator/health"
+          echo ""
+          echo "Các endpoint quan trọng:"
+          echo "- API Base: https://event-be-d0p6.onrender.com"
+          echo "- Health:https://event-be-d0p6.onrender.com/actuator/health"
+          echo "- Info: https://event-be-d0p6.onrender.com/actuator/info"

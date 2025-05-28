@@ -15,8 +15,8 @@ import java.util.Set;
 @Table(name = "SUKIEN")
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = true, exclude = {"diaDiem", "nguoiToChuc", "danhMucs"})
-@ToString(callSuper = true, exclude = {"diaDiem", "nguoiToChuc", "danhMucs"})
+@EqualsAndHashCode(callSuper = true, exclude = {"diaDiem", "nguoiToChuc", "danhMucs", "khuVucs"})
+@ToString(callSuper = true, exclude = {"diaDiem", "nguoiToChuc", "danhMucs", "khuVucs"})
 public class SuKien extends BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -57,4 +57,7 @@ public class SuKien extends BaseModel {
 
     @OneToMany(mappedBy = "suKien")
     private Set<LienKetSuKienDanhMuc> danhMucs;
+
+    @OneToMany(mappedBy = "suKien")
+    private Set<KhuVuc> khuVucs;
 }

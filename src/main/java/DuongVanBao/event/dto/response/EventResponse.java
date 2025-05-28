@@ -4,7 +4,6 @@ import DuongVanBao.event.model.BaseModel;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.math.BigDecimal;
 
@@ -22,6 +21,7 @@ public class EventResponse extends BaseModel {
     private DiaDiemResponse diaDiem;
     private List<DanhMucResponse> danhMucs;
     private List<LoaiVeResponse> loaiVes;
+    private List<KhuVucResponse> khuVucs;
 
     @Data
     public static class DiaDiemResponse {
