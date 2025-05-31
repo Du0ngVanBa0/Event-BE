@@ -10,6 +10,7 @@ import DuongVanBao.event.model.entity.Ve;
 import DuongVanBao.event.repository.DatVeRepository;
 import DuongVanBao.event.repository.ThanhToanRepository;
 import DuongVanBao.event.repository.VeRepository;
+import DuongVanBao.event.service.MailService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Service;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -37,6 +37,7 @@ public class ThanhToanService {
     private final DatVeRepository datVeRepository;
     private final ThanhToanRepository thanhToanRepository;
     private final VeRepository veRepository;
+    private final MailService mailService;
 
     public CreatePaymentResponse createPaymentUrl(CreatePaymentRequest request, HttpServletRequest servletRequest) throws UnsupportedEncodingException {
         DatVe datVe = datVeRepository.findById(request.getMaDatVe())
@@ -108,7 +109,6 @@ public class ThanhToanService {
         thanhToan.setSoTien(datVe.getTongTien());
         thanhToan.setPhuongThuc("VNPAY");
         thanhToan.setTrangThai("CHO_XU_LY");
-        thanhToan.setThoiGianThanhToan(LocalDateTime.now());
         thanhToanRepository.save(thanhToan);
 
         datVe.setUrl(paymentUrl);
@@ -177,8 +177,11 @@ public class ThanhToanService {
 
             thanhToan.setTrangThai("THANH_CONG");
             thanhToan.setPhanHoiVNP(vnp_TransactionNo + '-' + orderInfo);
+            thanhToan.setThoiGianThanhToan(LocalDateTime.now());
+
             thanhToanRepository.save(thanhToan);
 
+            mailService.sendConfirmPurchaseEmail(datVe, datVe.getKhachHang(), thanhToan);
             response.setSuccess(true);
             response.setMessage("Thanh toán thành công");
         } else {

@@ -33,6 +33,8 @@ dependencies {
 	compileOnly("org.projectlombok:lombok")
 	runtimeOnly("com.mysql:mysql-connector-j")
 	annotationProcessor("org.projectlombok:lombok")
+	implementation("com.google.zxing:core:3.5.3")
+	implementation("com.google.zxing:javase:3.5.3")
 	implementation("me.paulschwarz:spring-dotenv:4.0.0")
 	implementation("org.springframework.boot:spring-boot-starter-mail:3.4.4")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
