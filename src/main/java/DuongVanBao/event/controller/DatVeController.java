@@ -252,7 +252,7 @@ public class DatVeController {
             if (ve.getLoaiVe().getKhuVuc() != null) {
                 VeResponse.KhuVucInfo khuVucInfo = new VeResponse.KhuVucInfo();
                 khuVucInfo.setMaKhuVuc(ve.getLoaiVe().getKhuVuc().getMaKhuVuc());
-                khuVucInfo.setTenKhuVuc(ve.getLoaiVe().getKhuVuc().getTenKhuVuc());
+                khuVucInfo.setTenKhuVuc(ve.getLoaiVe().getKhuVuc().getTenHienThi());
                 loaiVeInfo.setKhuVuc(khuVucInfo);
             }
 

@@ -17,22 +17,51 @@ public class KhuVuc extends BaseModel {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String maKhuVuc;
 
-    @Column(nullable = false)
-    private String tenKhuVuc;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "maKhuVucMau")
+    private KhuVucMau template;
+
+    @Column
+    private String tenTuyChon;
 
     @Column(columnDefinition = "TEXT")
-    private String moTa;
+    private String moTaTuyChon;
 
     @Column(nullable = false)
     private String viTri;
 
-    @Column(columnDefinition = "TEXT")
-    private String layoutData;
+    @Column
+    private String mauSacTuyChon;
 
-    @OneToMany(mappedBy = "khuVuc")
+    @Column
+    private Integer toaDoX;
+
+    @Column
+    private Integer toaDoY;
+
+    @Column
+    private Integer chieuRong;
+
+    @Column
+    private Integer chieuCao;
+
+    @Column(nullable = false)
+    private boolean hoatDong = true;
+
+    @OneToMany(mappedBy = "khuVuc", cascade = CascadeType.ALL)
     private Set<LoaiVe> loaiVes;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "maSuKien")
+    @JoinColumn(name = "maSuKien", nullable = false)
     private SuKien suKien;
+
+    public String getTenHienThi() {
+        return tenTuyChon != null && !tenTuyChon.trim().isEmpty()
+                ? tenTuyChon : template.getTenKhuVuc();
+    }
+
+    public String getMauSacHienThi() {
+        return mauSacTuyChon != null && !mauSacTuyChon.trim().isEmpty()
+                ? mauSacTuyChon : template.getMauSac();
+    }
 }

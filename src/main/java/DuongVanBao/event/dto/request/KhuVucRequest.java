@@ -4,9 +4,13 @@ import lombok.Data;
 
 @Data
 public class KhuVucRequest {
-    private String tempId;
-    private String tenKhuVuc;
-    private String moTa;
+    private String maTemplate;
+    private String tenTuyChon;
+    private String moTaTuyChon;
+    private String mauSacTuyChon;
+    private Integer toaDoX;
+    private Integer toaDoY;
+    private Integer chieuRong;
+    private Integer chieuCao;
     private String viTri;
-    private String layoutData;
 }

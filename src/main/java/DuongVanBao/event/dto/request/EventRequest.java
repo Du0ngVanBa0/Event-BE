@@ -11,48 +11,32 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Data
 public class EventRequest {
-    @Setter
-    @Getter
     private String tieuDe;
-    @Setter
-    @Getter
+
     private String moTa;
 
-    @Setter
-    @Getter
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime thoiGianBatDau;
 
-    @Setter
-    @Getter
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime thoiGianKetThuc;
 
-    @Setter
-    @Getter
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime ngayMoBanVe;
 
-    @Setter
-    @Getter
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime ngayDongBanVe;
 
-    @Setter
-    @Getter
     private MultipartFile anhBia;
-    @Setter
-    @Getter
+
     private String tenDiaDiem;
-    @Setter
-    @Getter
+
     private String maPhuongXa;
-    @Setter
-    @Getter
+
     private String[] maDanhMucs;
-    @Setter
-    @Getter
+
     private List<LoaiVeRequest> loaiVes;
     @Getter
     private List<KhuVucRequest> khuVucs;
@@ -69,8 +53,22 @@ public class EventRequest {
 
     public void setKhuVucs(String khuVucsJson) {
         try {
-            // Handle null, empty, or the literal string "object"
-            if (khuVucsJson == null || khuVucsJson.trim().isEmpty() || "object".equals(khuVucsJson)) {
+            if (khuVucsJson == null || khuVucsJson.trim().isEmpty()) {
+                this.khuVucs = List.of();
+                return;
+            }
+
+            String trimmed = khuVucsJson.trim();
+
+            if ("object".equals(trimmed) ||
+                    trimmed.contains("[object Object]") ||
+                    trimmed.matches("\\[object Object\\](,\\[object Object\\])*")) {
+                System.err.println("Received invalid object string format: " + trimmed);
+                this.khuVucs = List.of();
+                return;
+            }
+
+            if ("[]".equals(trimmed)) {
                 this.khuVucs = List.of();
                 return;
             }
@@ -79,7 +77,6 @@ public class EventRequest {
             ObjectMapper mapper = new ObjectMapper();
             mapper.registerModule(new JavaTimeModule());
 
-            String trimmed = khuVucsJson.trim();
             if (trimmed.startsWith("[")) {
                 this.khuVucs = mapper.readValue(trimmed,
                         mapper.getTypeFactory().constructCollectionType(List.class, KhuVucRequest.class));
@@ -87,13 +84,22 @@ public class EventRequest {
                 KhuVucRequest singleKhuVuc = mapper.readValue(trimmed, KhuVucRequest.class);
                 this.khuVucs = List.of(singleKhuVuc);
             } else {
-                System.err.println("Invalid khuVucs format: " + khuVucsJson);
+                System.err.println("Invalid khuVucs format - not JSON: " + khuVucsJson);
                 this.khuVucs = List.of();
             }
+
+            System.out.println("Successfully parsed " + this.khuVucs.size() + " khu vucs");
+            this.khuVucs.forEach(kv -> {
+                System.out.println("  - Template: " + kv.getMaTemplate() +
+                        ", Custom name: " + kv.getTenTuyChon() +
+                        ", Position: (" + kv.getToaDoX() + ", " + kv.getToaDoY() + ")");
+            });
+
         } catch (Exception e) {
             System.err.println("Error processing khuVucs: " + e.getMessage());
+            System.err.println("Input was: " + khuVucsJson);
             e.printStackTrace();
-            this.khuVucs = List.of(); // Use empty list instead of throwing exception
+            this.khuVucs = List.of();
         }
     }
 }

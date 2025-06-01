@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static DuongVanBao.event.util.SecurityUtils.getCurrentUserId;
@@ -35,6 +37,7 @@ public class SuKienController implements BaseController<EventRequest, String> {
     private final SuKienService suKienService;
     private final DiaDiemService diaDiemService;
     private final PhuongXaService phuongXaService;
+    private final KhuVucMauService khuVucMauService;
     private final VeService veService;
     private final LienKetSuKienDanhMucService lienKetService;
     private final DanhMucSuKienService danhMucService;
@@ -95,8 +98,8 @@ public class SuKienController implements BaseController<EventRequest, String> {
         
         SuKien suKien = createSuKien(request);
         createDanhMucLinks(suKien, request.getMaDanhMucs());
-        List<KhuVuc> khuVucs = createKhuVucs(suKien, request.getKhuVucs());
-        createLoaiVes(suKien, request.getLoaiVes(), khuVucs);
+        Map<String, KhuVuc> templateToKhuVucMap = createKhuVucs(suKien, request.getKhuVucs());
+        createLoaiVes(suKien, request.getLoaiVes(), templateToKhuVucMap);
 
         return ResponseEntity.ok(SuccessResponse.withData(toEventResponse(suKien)));
     }
@@ -239,29 +242,57 @@ public class SuKienController implements BaseController<EventRequest, String> {
         }
     }
 
-    private List<KhuVuc> createKhuVucs(SuKien suKien, List<KhuVucRequest> khuVucRequests) {
+    private Map<String,KhuVuc> createKhuVucs(SuKien suKien, List<KhuVucRequest> khuVucRequests) {
+        Map<String, KhuVuc> templateToKhuVucMap = new HashMap<>();
+
         if (khuVucRequests == null || khuVucRequests.isEmpty()) {
+            // Create default zone if no zones specified
             KhuVuc defaultKhuVuc = new KhuVuc();
-            defaultKhuVuc.setTenKhuVuc("Khu vực mặc định");
-            defaultKhuVuc.setViTri("Mặc định");
-            defaultKhuVuc.setMoTa("Khu vực mặc định cho sự kiện");
-            defaultKhuVuc.setLayoutData("{}");
+            // Cần tạo KhuVucMau default hoặc handle case này
+            defaultKhuVuc.setTenTuyChon("Khu vực mặc định");
+            defaultKhuVuc.setViTri("Vị trí (0, 0)");
+            defaultKhuVuc.setMoTaTuyChon("Khu vực mặc định cho sự kiện");
             defaultKhuVuc.setSuKien(suKien);
-            return List.of(khuVucRepository.save(defaultKhuVuc));
+            defaultKhuVuc.setHoatDong(true);
+
+            // Tìm template mặc định hoặc tạo một cái
+            KhuVucMau defaultTemplate = khuVucMauService.findByHoatDongTrueOrderByThuTuHienThi().stream()
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Không có template khu vực nào available"));
+            defaultKhuVuc.setTemplate(defaultTemplate);
+
+            KhuVuc savedKhuVuc = khuVucRepository.save(defaultKhuVuc);
+            templateToKhuVucMap.put("default", savedKhuVuc);
+            return templateToKhuVucMap;
         }
 
-        return khuVucRequests.stream()
-                .map(request -> {
-                    KhuVuc khuVuc = new KhuVuc();
-                    khuVuc.setTenKhuVuc(request.getTenKhuVuc());
-                    khuVuc.setMoTa(request.getMoTa());
-                    khuVuc.setViTri(request.getViTri());
-                    khuVuc.setLayoutData(request.getLayoutData());
-                    khuVuc.setSuKien(suKien);
-                    khuVuc.setMaKhuVuc(request.getTempId());
-                    return khuVucRepository.save(khuVuc);
-                })
-                .collect(Collectors.toList());
+        for (KhuVucRequest request : khuVucRequests) {
+            KhuVucMau template = khuVucMauService.findById(request.getMaTemplate())
+                    .orElseThrow(() -> new RuntimeException("Template không tồn tại: " + request.getMaTemplate()));
+
+            KhuVuc khuVuc = new KhuVuc();
+            khuVuc.setTemplate(template);
+            khuVuc.setSuKien(suKien);
+
+            khuVuc.setTenTuyChon(request.getTenTuyChon());
+            khuVuc.setMoTaTuyChon(request.getMoTaTuyChon());
+            khuVuc.setMauSacTuyChon(request.getMauSacTuyChon());
+
+            khuVuc.setToaDoX(request.getToaDoX() != null ? request.getToaDoX() : template.getToaDoXMacDinh());
+            khuVuc.setToaDoY(request.getToaDoY() != null ? request.getToaDoY() : template.getToaDoYMacDinh());
+            khuVuc.setChieuRong(request.getChieuRong() != null ? request.getChieuRong() : template.getChieuRongMacDinh());
+            khuVuc.setChieuCao(request.getChieuCao() != null ? request.getChieuCao() : template.getChieuCaoMacDinh());
+
+            khuVuc.setViTri(request.getViTri() != null ? request.getViTri() :
+                    String.format("Vị trí (%d, %d)", khuVuc.getToaDoX(), khuVuc.getToaDoY()));
+
+            khuVuc.setHoatDong(true);
+
+            KhuVuc savedKhuVuc = khuVucRepository.save(khuVuc);
+            templateToKhuVucMap.put(request.getMaTemplate(), savedKhuVuc);
+        }
+
+        return templateToKhuVucMap;
     }
 
     private SuKien createSuKien(EventRequest request) {
@@ -312,7 +343,7 @@ public class SuKienController implements BaseController<EventRequest, String> {
         });
     }
 
-    private void createLoaiVes(SuKien suKien, List<LoaiVeRequest> loaiVes, List<KhuVuc> khuVucs) {
+    private void createLoaiVes(SuKien suKien, List<LoaiVeRequest> loaiVes, Map<String, KhuVuc> templateToKhuVucMap) {
         if (loaiVes != null) {
             loaiVes.forEach(request -> {
                 LoaiVe loaiVe = new LoaiVe();
@@ -324,12 +355,12 @@ public class SuKienController implements BaseController<EventRequest, String> {
                 loaiVe.setSoLuongToiDa(request.getSoLuongToiDa());
                 loaiVe.setGiaTien(request.getGiaTien());
 
-                KhuVuc khuVuc = khuVucs.stream()
-                        .filter(zone -> zone.getMaKhuVuc().equals(request.getMaKhuVuc()) ||
-                                (zone.getLayoutData() != null &&
-                                        zone.getLayoutData().contains(request.getMaKhuVuc())))
-                        .findFirst()
-                        .orElse(khuVucs.isEmpty() ? null : khuVucs.get(0));
+                KhuVuc khuVuc = templateToKhuVucMap.get(request.getMaKhuVuc());
+                if (khuVuc == null) {
+                    khuVuc = templateToKhuVucMap.values().iterator().next();
+                    System.err.println("Warning: Could not find zone for template " + request.getMaKhuVuc() +
+                            ", using fallback zone: " + khuVuc.getMaKhuVuc());
+                }
 
                 loaiVe.setKhuVuc(khuVuc);
                 loaiVeService.save(loaiVe);
