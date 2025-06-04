@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -88,17 +87,9 @@ public class EventRequest {
                 this.khuVucs = List.of();
             }
 
-            System.out.println("Successfully parsed " + this.khuVucs.size() + " khu vucs");
-            this.khuVucs.forEach(kv -> {
-                System.out.println("  - Template: " + kv.getMaTemplate() +
-                        ", Custom name: " + kv.getTenTuyChon() +
-                        ", Position: (" + kv.getToaDoX() + ", " + kv.getToaDoY() + ")");
-            });
-
         } catch (Exception e) {
             System.err.println("Error processing khuVucs: " + e.getMessage());
             System.err.println("Input was: " + khuVucsJson);
-            e.printStackTrace();
             this.khuVucs = List.of();
         }
     }

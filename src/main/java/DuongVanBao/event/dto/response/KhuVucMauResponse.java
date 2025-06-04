@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class KhuVucMauResponse {
-    private String maTemplate;
+    private String maKhuVucMau;
     private String tenKhuVuc;
     private String moTa;
     private String mauSac;

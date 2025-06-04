@@ -51,5 +51,31 @@ public class EventResponse extends BaseModel {
         private Integer soLuongToiDa;
         private Integer veConLai;
         private BigDecimal giaTien;
+        private String maKhuVuc;
+    }
+    @Data
+    public static class KhuVucResponse {
+        private String maKhuVuc;
+        private String tenHienThi;
+        private String tenGoc;
+        private String moTa;
+        private String viTri;
+        private String mauSacHienThi;
+        private Integer toaDoX;
+        private Integer toaDoY;
+        private Integer chieuRong;
+        private Integer chieuCao;
+        private boolean hoatDong;
+
+        private KhuVucMauInfo template;
+
+        @Data
+        public static class KhuVucMauInfo {
+            private String maKhuVucMau;
+            private String tenKhuVuc;
+            private String mauSac;
+            private String hinhDang;
+            private Integer thuTuHienThi;
+        }
     }
 }
