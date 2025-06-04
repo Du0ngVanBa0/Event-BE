@@ -47,6 +47,6 @@ public class LoaiVe extends BaseModel {
     private Set<Ve> ves;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "maKhuVuc", nullable = false)
+    @JoinColumn(name = "maKhuVuc")
     private KhuVuc khuVuc;
 }

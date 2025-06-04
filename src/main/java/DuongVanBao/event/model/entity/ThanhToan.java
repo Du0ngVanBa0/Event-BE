@@ -37,6 +37,5 @@ public class ThanhToan extends BaseModel {
     @Column(columnDefinition = "TEXT")
     private String phanHoiVNP;
 
-    @Column(nullable = false)
     private LocalDateTime thoiGianThanhToan;
 }

@@ -4,7 +4,6 @@ import DuongVanBao.event.dto.request.EventRequest;
 import DuongVanBao.event.dto.request.KhuVucRequest;
 import DuongVanBao.event.dto.request.LoaiVeRequest;
 import DuongVanBao.event.dto.response.EventResponse;
-import DuongVanBao.event.dto.response.KhuVucResponse;
 import DuongVanBao.event.dto.response.SuccessResponse;
 import DuongVanBao.event.model.entity.*;
 import DuongVanBao.event.repository.KhuVucRepository;
@@ -267,8 +266,8 @@ public class SuKienController implements BaseController<EventRequest, String> {
         }
 
         for (KhuVucRequest request : khuVucRequests) {
-            KhuVucMau template = khuVucMauService.findById(request.getMaTemplate())
-                    .orElseThrow(() -> new RuntimeException("Template không tồn tại: " + request.getMaTemplate()));
+            KhuVucMau template = khuVucMauService.findById(request.getMaKhuVucMau())
+                    .orElseThrow(() -> new RuntimeException("Template không tồn tại: " + request.getMaKhuVucMau()));
 
             KhuVuc khuVuc = new KhuVuc();
             khuVuc.setTemplate(template);
@@ -289,7 +288,7 @@ public class SuKienController implements BaseController<EventRequest, String> {
             khuVuc.setHoatDong(true);
 
             KhuVuc savedKhuVuc = khuVucRepository.save(khuVuc);
-            templateToKhuVucMap.put(request.getMaTemplate(), savedKhuVuc);
+            templateToKhuVucMap.put(request.getMaKhuVucMau(), savedKhuVuc);
         }
 
         return templateToKhuVucMap;
@@ -398,26 +397,61 @@ public class SuKienController implements BaseController<EventRequest, String> {
             .collect(Collectors.toList());
         response.setDanhMucs(danhMucList);
 
+        List<EventResponse.KhuVucResponse> khuVucList = khuVucRepository.findAllBySuKien(suKien)
+                .stream()
+                .filter(KhuVuc::isHoatDong)
+                .map(this::toKhuVucResponse)
+                .collect(Collectors.toList());
+        response.setKhuVucs(khuVucList);
+
         List<EventResponse.LoaiVeResponse> loaiVeList = loaiVeService.findBySuKien(suKien)
             .stream()
             .map(loaiVe -> {
                 EventResponse.LoaiVeResponse loaiVeResponse = new EventResponse.LoaiVeResponse();
                 BeanUtils.copyProperties(loaiVe, loaiVeResponse);
+
+                if (loaiVe.getKhuVuc() != null) {
+                    loaiVeResponse.setMaKhuVuc(loaiVe.getKhuVuc().getMaKhuVuc());
+                }
                 return loaiVeResponse;
             })
             .collect(Collectors.toList());
         response.setLoaiVes(loaiVeList);
 
-        List<KhuVucResponse> khuVucList = khuVucRepository.findAllBySuKien(suKien)
-                .stream()
-                .map(khuVuc -> {
-                    KhuVucResponse khuVucResponse = new KhuVucResponse();
-                    BeanUtils.copyProperties(khuVuc, khuVucResponse);
-                    khuVucResponse.setTempId(khuVuc.getMaKhuVuc());
-                    return khuVucResponse;
-                })
-                .collect(Collectors.toList());
-        response.setKhuVucs(khuVucList);
+        return response;
+    }
+
+    private EventResponse.KhuVucResponse toKhuVucResponse(KhuVuc khuVuc) {
+        EventResponse.KhuVucResponse response = new EventResponse.KhuVucResponse();
+
+        response.setMaKhuVuc(khuVuc.getMaKhuVuc());
+        response.setTenHienThi(khuVuc.getTenHienThi());
+        response.setMoTa(khuVuc.getMoTaTuyChon());
+        response.setViTri(khuVuc.getViTri());
+        response.setMauSacHienThi(khuVuc.getMauSacHienThi());
+        response.setToaDoX(khuVuc.getToaDoX());
+        response.setToaDoY(khuVuc.getToaDoY());
+        response.setChieuRong(khuVuc.getChieuRong());
+        response.setChieuCao(khuVuc.getChieuCao());
+        response.setHoatDong(khuVuc.isHoatDong());
+
+        if (khuVuc.getTemplate() != null) {
+            KhuVucMau template = khuVuc.getTemplate();
+            response.setTenGoc(template.getTenKhuVuc());
+
+            EventResponse.KhuVucResponse.KhuVucMauInfo templateInfo =
+                    new EventResponse.KhuVucResponse.KhuVucMauInfo();
+            templateInfo.setMaKhuVucMau(template.getMaKhuVucMau());
+            templateInfo.setTenKhuVuc(template.getTenKhuVuc());
+            templateInfo.setMauSac(template.getMauSac());
+            templateInfo.setHinhDang(template.getHinhDang());
+            templateInfo.setThuTuHienThi(template.getThuTuHienThi());
+
+            response.setTemplate(templateInfo);
+        } else {
+            response.setTenGoc("Khu vực tùy chỉnh");
+        }
+
         return response;
     }
 }

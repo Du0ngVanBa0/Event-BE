@@ -1,6 +1,7 @@
 package DuongVanBao.event.controller;
 
 import DuongVanBao.event.dto.response.KhuVucMauResponse;
+import DuongVanBao.event.dto.response.SuccessResponse;
 import DuongVanBao.event.model.entity.KhuVucMau;
 import DuongVanBao.event.service.KhuVucMauService;
 import org.springframework.http.ResponseEntity;
@@ -21,17 +22,17 @@ public class KhuVucMauController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<KhuVucMauResponse>> getActiveTemplates() {
+    public ResponseEntity<?> getActiveTemplates() {
         List<KhuVucMau> templates = khuVucMauService.findByHoatDongTrueOrderByThuTuHienThi();
         List<KhuVucMauResponse> response = templates.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(SuccessResponse.withData(response));
     }
 
     private KhuVucMauResponse convertToResponse(KhuVucMau template) {
         KhuVucMauResponse response = new KhuVucMauResponse();
-        response.setMaTemplate(template.getMaKhuVucMau());
+        response.setMaKhuVucMau(template.getMaKhuVucMau());
         response.setTenKhuVuc(template.getTenKhuVuc());
         response.setMoTa(template.getMoTa());
         response.setMauSac(template.getMauSac());
