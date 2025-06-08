@@ -1,6 +1,10 @@
 package DuongVanBao.event.service.impl;
 
+import DuongVanBao.event.model.entity.DanhMucSuKien;
+import DuongVanBao.event.model.entity.LienKetSuKienDanhMuc;
 import DuongVanBao.event.model.entity.SuKien;
+import DuongVanBao.event.repository.DanhMucSuKienRepository;
+import DuongVanBao.event.repository.LienKetSuKienDanhMucRepository;
 import DuongVanBao.event.repository.SuKienRepository;
 import DuongVanBao.event.service.SuKienService;
 import org.springframework.data.domain.Page;
@@ -11,10 +15,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class SuKienServiceImpl extends BaseServiceImpl<SuKien, String> implements SuKienService {
     private final SuKienRepository suKienRepository;
+    private final LienKetSuKienDanhMucRepository lienKetSuKienDanhMucRepository;
+    private final DanhMucSuKienRepository danhMucRepository;
 
-    public SuKienServiceImpl(SuKienRepository repository, SuKienRepository suKienRepository) {
+    public SuKienServiceImpl(SuKienRepository repository, SuKienRepository suKienRepository, LienKetSuKienDanhMucRepository lienKetSuKienDanhMucRepository, DanhMucSuKienRepository danhMucRepository) {
         super(repository);
         this.suKienRepository = suKienRepository;
+        this.lienKetSuKienDanhMucRepository = lienKetSuKienDanhMucRepository;
+        this.danhMucRepository = danhMucRepository;
     }
 
     @Override
@@ -43,5 +51,23 @@ public class SuKienServiceImpl extends BaseServiceImpl<SuKien, String> implement
         }
 
         return suKienRepository.findAll(specification, pageable);
+    }
+
+    @Override
+    public void updateDanhMucLinks(SuKien suKien, String[] maDanhMucs) {
+        lienKetSuKienDanhMucRepository.deleteBySuKienId(suKien.getMaSuKien());
+
+        for (String maDanhMuc : maDanhMucs) {
+            if (maDanhMuc != null && !maDanhMuc.isEmpty()) {
+                DanhMucSuKien danhMuc = danhMucRepository.findById(maDanhMuc)
+                        .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại"));
+
+                LienKetSuKienDanhMuc lienKet = new LienKetSuKienDanhMuc();
+                lienKet.setMaSuKien(suKien.getMaSuKien());
+                lienKet.setMaDanhMuc(maDanhMuc);
+                lienKet.setSuKien(suKien);
+                lienKet.setDanhMuc(danhMuc);
+                lienKetSuKienDanhMucRepository.save(lienKet);            }
+        }
     }
 }
