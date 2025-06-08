@@ -120,14 +120,17 @@ public class SuKienController implements BaseController<EventRequest, String> {
             }
         }
 
-        if (!suKien.getDiaDiem().getTenDiaDiem().equals(request.getTenDiaDiem())
-                || !suKien.getDiaDiem().getPhuongXa().getMaPhuongXa().equals(request.getMaPhuongXa())) {
-            DiaDiem diaDiem = updateDiaDiem(request, suKien.getDiaDiem());
-            suKien.setDiaDiem(diaDiem);
+        DiaDiem diaDiem = suKien.getDiaDiem();
+        if (diaDiem != null) {
+            diaDiem.setTenDiaDiem(request.getTenDiaDiem());
+            if (!diaDiem.getPhuongXa().getMaPhuongXa().equals(request.getMaPhuongXa())) {
+                diaDiem.setPhuongXa(phuongXaService.findById(request.getMaPhuongXa())
+                        .orElseThrow(() -> new RuntimeException("Không tìm thấy phường xã")));
+            }
+            diaDiemService.save(diaDiem);
         }
 
-        BeanUtils.copyProperties(request, suKien, "anhBia", "maDanhMucs", "loaiVes", "hoatDong");
-        suKien.setHoatDong(suKien.isHoatDong());
+        BeanUtils.copyProperties(request, suKien, "anhBia", "maDanhMucs", "khuVucs", "loaiVes", "hoatDong");
 
         if (request.getAnhBia() != null && !request.getAnhBia().isEmpty()) {
             if (suKien.getAnhBia() != null) {
@@ -137,35 +140,9 @@ public class SuKienController implements BaseController<EventRequest, String> {
             suKien.setAnhBia(fileName);
         }
 
-        lienKetService.deleteBySuKienId(id);
-        for (String maDanhMuc : request.getMaDanhMucs()) {
-            DanhMucSuKien danhMuc = danhMucService.findById(maDanhMuc)
-                    .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại"));
-
-            LienKetSuKienDanhMuc lienKet = new LienKetSuKienDanhMuc();
-            lienKet.setMaSuKien(suKien.getMaSuKien());
-            lienKet.setMaDanhMuc(maDanhMuc);
-            lienKet.setSuKien(suKien);
-            lienKet.setDanhMuc(danhMuc);
-            lienKetService.save(lienKet);
-        }
-
-        loaiVeService.deleteAllBySuKien(suKien);
-        if (request.getLoaiVes() != null) {
-            for (LoaiVeRequest loaiVeRequest : request.getLoaiVes()) {
-                LoaiVe loaiVe = new LoaiVe();
-                loaiVe.setSuKien(suKien);
-                loaiVe.setTenLoaiVe(loaiVeRequest.getTenLoaiVe());
-                loaiVe.setMoTa(loaiVeRequest.getMoTa());
-                loaiVe.setSoLuong(loaiVeRequest.getSoLuong());
-                loaiVe.setSoLuongToiThieu(loaiVeRequest.getSoLuongToiThieu());
-                loaiVe.setSoLuongToiDa(loaiVeRequest.getSoLuongToiDa());
-                loaiVe.setGiaTien(loaiVeRequest.getGiaTien());
-                KhuVuc kv = khuVucRepository.findById("1").get();
-                loaiVe.setKhuVuc(kv);
-                loaiVeService.save(loaiVe);
-            }
-        }
+        suKienService.updateDanhMucLinks(suKien, request.getMaDanhMucs());
+        Map<String, KhuVuc> updatedKhuVucs = updateKhuVucs(suKien, request.getKhuVucs());
+        updateLoaiVes(suKien, request.getLoaiVes(), updatedKhuVucs);
 
         suKien = suKienService.save(suKien);
         return ResponseEntity.ok(SuccessResponse.withData(toEventResponse(suKien)));
@@ -231,6 +208,93 @@ public class SuKienController implements BaseController<EventRequest, String> {
         }
 
         return ResponseEntity.ok(SuccessResponse.withData(responses));
+    }
+
+    private Map<String, KhuVuc> updateKhuVucs(SuKien suKien, List<KhuVucRequest> khuVucRequests) {
+        List<KhuVuc> existingKhuVucs = khuVucRepository.findAllBySuKien(suKien);
+        Map<String, KhuVuc> templateToKhuVucMap = new HashMap<>();
+
+        if (khuVucRequests == null || khuVucRequests.isEmpty()) {
+            return templateToKhuVucMap;
+        }
+
+        Map<String, KhuVuc> existingKhuVucMap = existingKhuVucs.stream()
+                .collect(Collectors.toMap(KhuVuc::getMaKhuVuc, khuVuc -> khuVuc));
+
+        for (KhuVucRequest request : khuVucRequests) {
+            KhuVucMau template = khuVucMauService.findById(request.getMaKhuVucMau())
+                    .orElseThrow(() -> new RuntimeException("Khu vực mẫu không tồn tại: " + request.getMaKhuVucMau()));
+
+            KhuVuc existingKhuVuc = existingKhuVucs.stream()
+                    .filter(kv -> kv.getTemplate() != null &&
+                            kv.getTemplate().getMaKhuVucMau().equals(request.getMaKhuVucMau()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (existingKhuVuc != null) {
+                existingKhuVuc.setTenTuyChon(request.getTenTuyChon());
+                existingKhuVuc.setMoTaTuyChon(request.getMoTaTuyChon());
+                existingKhuVuc.setMauSacTuyChon(request.getMauSacTuyChon());
+                existingKhuVuc.setToaDoX(request.getToaDoX() != null ? request.getToaDoX() : template.getToaDoXMacDinh());
+                existingKhuVuc.setToaDoY(request.getToaDoY() != null ? request.getToaDoY() : template.getToaDoYMacDinh());
+                existingKhuVuc.setChieuRong(request.getChieuRong() != null ? request.getChieuRong() : template.getChieuRongMacDinh());
+                existingKhuVuc.setChieuCao(request.getChieuCao() != null ? request.getChieuCao() : template.getChieuCaoMacDinh());
+                existingKhuVuc.setViTri(request.getViTri() != null ? request.getViTri() :
+                        String.format("Vị trí (%d, %d)", existingKhuVuc.getToaDoX(), existingKhuVuc.getToaDoY()));
+
+                KhuVuc savedKhuVuc = khuVucRepository.save(existingKhuVuc);
+                templateToKhuVucMap.put(request.getMaKhuVucMau(), savedKhuVuc);
+
+                existingKhuVucMap.remove(existingKhuVuc.getMaKhuVuc());
+            } else {
+                KhuVuc newKhuVuc = new KhuVuc();
+                newKhuVuc.setTemplate(template);
+                newKhuVuc.setSuKien(suKien);
+                newKhuVuc.setTenTuyChon(request.getTenTuyChon());
+                newKhuVuc.setMoTaTuyChon(request.getMoTaTuyChon());
+                newKhuVuc.setMauSacTuyChon(request.getMauSacTuyChon());
+                newKhuVuc.setToaDoX(request.getToaDoX() != null ? request.getToaDoX() : template.getToaDoXMacDinh());
+                newKhuVuc.setToaDoY(request.getToaDoY() != null ? request.getToaDoY() : template.getToaDoYMacDinh());
+                newKhuVuc.setChieuRong(request.getChieuRong() != null ? request.getChieuRong() : template.getChieuRongMacDinh());
+                newKhuVuc.setChieuCao(request.getChieuCao() != null ? request.getChieuCao() : template.getChieuCaoMacDinh());
+                newKhuVuc.setViTri(request.getViTri() != null ? request.getViTri() :
+                        String.format("Vị trí (%d, %d)", newKhuVuc.getToaDoX(), newKhuVuc.getToaDoY()));
+                newKhuVuc.setHoatDong(true);
+
+                KhuVuc savedKhuVuc = khuVucRepository.save(newKhuVuc);
+                templateToKhuVucMap.put(request.getMaKhuVucMau(), savedKhuVuc);
+            }
+        }
+
+        return templateToKhuVucMap;
+    }
+
+    private void updateLoaiVes(SuKien suKien, List<LoaiVeRequest> loaiVeRequests, Map<String, KhuVuc> khuVucMap) {
+        loaiVeService.deleteAllBySuKien(suKien);
+
+        if (loaiVeRequests != null && !loaiVeRequests.isEmpty()) {
+            for (LoaiVeRequest request : loaiVeRequests) {
+                LoaiVe loaiVe = new LoaiVe();
+                loaiVe.setSuKien(suKien);
+                loaiVe.setTenLoaiVe(request.getTenLoaiVe());
+                loaiVe.setMoTa(request.getMoTa());
+                loaiVe.setSoLuong(request.getSoLuong());
+                loaiVe.setSoLuongToiThieu(request.getSoLuongToiThieu());
+                loaiVe.setSoLuongToiDa(request.getSoLuongToiDa());
+                loaiVe.setGiaTien(request.getGiaTien());
+
+                KhuVuc khuVuc = khuVucMap.get(request.getMaKhuVuc());
+                if (khuVuc == null && !khuVucMap.isEmpty()) {
+                    khuVuc = khuVucMap.values().iterator().next();
+                }
+
+                if (khuVuc != null) {
+                    loaiVe.setKhuVuc(khuVuc);
+                }
+
+                loaiVeService.save(loaiVe);
+            }
+        }
     }
 
     private void validateDanhMucs(String[] maDanhMucs) {
@@ -319,13 +383,6 @@ public class SuKienController implements BaseController<EventRequest, String> {
         diaDiem.setPhuongXa(phuongXaService.findById(request.getMaPhuongXa())
             .orElseThrow(() -> new RuntimeException("Không tìm thấy phường xã")));
         return diaDiemService.save(diaDiem);
-    }
-
-    private DiaDiem updateDiaDiem(EventRequest request, DiaDiem diaDiemUpdate) {
-        diaDiemUpdate.setTenDiaDiem(request.getTenDiaDiem());
-        diaDiemUpdate.setPhuongXa(phuongXaService.findById(request.getMaPhuongXa())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phường xã")));
-        return diaDiemService.save(diaDiemUpdate);
     }
 
     private void createDanhMucLinks(SuKien suKien, String[] maDanhMucs) {
