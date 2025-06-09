@@ -61,9 +61,10 @@ public class SuKienController implements BaseController<EventRequest, String> {
 
     @GetMapping("/page-filter")
     public ResponseEntity<?> getPageFilter(Pageable pageable,
+                                           @RequestParam(required = false) String name,
                                            @RequestParam(required = false) String maDanhMuc,
                                            @RequestParam(required = false) Boolean hoatDong) {
-        Page<EventResponse> responses = suKienService.findPageSuKien(maDanhMuc, hoatDong, pageable)
+        Page<EventResponse> responses = suKienService.findPageSuKien(name, maDanhMuc, hoatDong, pageable)
                 .map(this::toEventResponse);
         return ResponseEntity.ok(SuccessResponse.withData(responses));
     }

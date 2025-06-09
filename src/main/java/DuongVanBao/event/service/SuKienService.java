@@ -8,6 +8,6 @@ public interface SuKienService extends BaseService<SuKien, String> {
     Page<SuKien> findAllByHoatDong(boolean hoatDong, Pageable pageable);
     Page<SuKien> findByNguoiToChuc(String maNguoiDung, Pageable pageable);
     Page<SuKien> findByNguoiToChucAndHoatDong(String maNguoiDung, boolean hoatDong, Pageable pageable);
-    Page<SuKien> findPageSuKien(String maDanhMuc, Boolean hoatDong, Pageable pageable);
+    Page<SuKien> findPageSuKien(String name, String maDanhMuc, Boolean hoatDong, Pageable pageable);
     void updateDanhMucLinks(SuKien suKien, String[] maDanhMucs);
 }
