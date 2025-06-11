@@ -1,6 +1,7 @@
 package DuongVanBao.event.service.impl;
 
 import DuongVanBao.event.dto.mapper.NguoiDungMapper;
+import DuongVanBao.event.dto.request.ChangeInformationRequest;
 import DuongVanBao.event.dto.request.NguoiDungUpdateRequest;
 import DuongVanBao.event.dto.response.NguoiDungResponse;
 import DuongVanBao.event.enums.Role;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class NguoiDungServiceImpl extends BaseServiceImpl<NguoiDung, String> implements NguoiDungService {
@@ -128,6 +128,33 @@ public class NguoiDungServiceImpl extends BaseServiceImpl<NguoiDung, String> imp
         return nguoiDungMapper.toResponse(nguoiDungRepository.save(nguoiDung));
     }
 
+    @Override
+    public void changeInformation(String maNguoiDung, ChangeInformationRequest request) {
+        NguoiDung nguoiDung = nguoiDungRepository.findByMaNguoiDung(maNguoiDung)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        if (request.getAnhDaiDien() != null && !request.getAnhDaiDien().isEmpty()) {
+            if (nguoiDung.getAnhDaiDien() != null && !nguoiDung.getAnhDaiDien().isEmpty()) {
+                fileUtil.deleteFile(nguoiDung.getAnhDaiDien());
+            }
+            String fileName = fileUtil.saveFile(request.getAnhDaiDien());
+            nguoiDung.setAnhDaiDien(fileName);
+        }
+
+        nguoiDung.setTenHienThi(request.getHoVaTen());
+
+        if (request.getMatKhauHienTai() != null && !request.getMatKhauHienTai().isEmpty()) {
+            if (!passwordEncoder.matches(request.getMatKhauHienTai(), nguoiDung.getMatKhau())) {
+                throw new RuntimeException("Mật khẩu hiện tại không đúng");
+            }
+
+            if (request.getMatKhauMoi() != null && !request.getMatKhauMoi().isEmpty()) {
+                nguoiDung.setMatKhau(passwordEncoder.encode(request.getMatKhauMoi()));
+            }
+        }
+
+        nguoiDungRepository.save(nguoiDung);
+    }
     @Transactional
     @Override
     public void deleteUser(String maNguoiDung) {

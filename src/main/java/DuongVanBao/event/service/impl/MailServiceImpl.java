@@ -171,8 +171,7 @@ public class MailServiceImpl implements MailService {
 
             ticketRows.append("<tr>")
                     .append("<td style=\"padding:8px;border:1px solid #ddd;\">").append(loaiVe.getTenLoaiVe()).append("</td>")
-                    .append("<td style=\"padding:8px;border:1px solid #ddd;\">").append(loaiVe.getKhuVuc().getTenHienThi()).append("</td>")
-                    .append("<td style=\"padding:8px;border:1px solid #ddd;\">").append(ve.getMaVe()).append("</td>")
+                    .append("<td style=\"padding:8px;border:1px solid #ddd;\">").append(loaiVe.getKhuVuc() != null ? loaiVe.getKhuVuc().getTenHienThi() : "").append("</td>")                    .append("<td style=\"padding:8px;border:1px solid #ddd;\">").append(ve.getMaVe()).append("</td>")
                     .append("<td style=\"padding:8px;border:1px solid #ddd;text-align:center;\"><img src=\"cid:").append(qrId).append("\" width=\"" + QR_CODE_SIZE + "\" height=\""+ QR_CODE_SIZE +"\"></td>")
                     .append("<td style=\"padding:8px;border:1px solid #ddd;\">").append(currencyFormat.format(loaiVe.getGiaTien())).append("</td>")
                     .append("</tr>");

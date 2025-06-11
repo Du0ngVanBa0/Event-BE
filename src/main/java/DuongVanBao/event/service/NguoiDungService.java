@@ -1,5 +1,6 @@
 package DuongVanBao.event.service;
 
+import DuongVanBao.event.dto.request.ChangeInformationRequest;
 import DuongVanBao.event.dto.request.NguoiDungUpdateRequest;
 import DuongVanBao.event.dto.response.NguoiDungResponse;
 import DuongVanBao.event.enums.Role;
@@ -14,7 +15,8 @@ public interface NguoiDungService extends BaseService<NguoiDung, String> {
     NguoiDungResponse updateUser(String maNguoiDung, NguoiDungUpdateRequest request);
     NguoiDungResponse updateRole(String maNguoiDung, Role vaiTro);
     void deleteUser(String maNguoiDung);
-    Page<NguoiDungResponse> findPageWithFilters(
+    public void changeInformation(String maNguoiDung, ChangeInformationRequest request);
+        Page<NguoiDungResponse> findPageWithFilters(
             Boolean hoatDong,
             String tenNguoiDung,
             Role vaiTro,

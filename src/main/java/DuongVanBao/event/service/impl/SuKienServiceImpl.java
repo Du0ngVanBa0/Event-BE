@@ -41,13 +41,17 @@ public class SuKienServiceImpl extends BaseServiceImpl<SuKien, String> implement
     }
 
     @Override
-    public Page<SuKien> findPageSuKien(String maDanhMuc, Boolean hoatDong, Pageable pageable) {
+    public Page<SuKien> findPageSuKien(String name, String maDanhMuc, Boolean hoatDong, Pageable pageable) {
         Specification<SuKien> specification = Specification.where(null);
         if (maDanhMuc != null) {
             specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.join("danhMucs").get("maDanhMuc"), maDanhMuc));
         }
         if (hoatDong != null) {
             specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("hoatDong"), hoatDong));
+        }
+        if (name != null && !name.isEmpty()) {
+            specification = specification.and((root, query, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.lower(root.get("tieuDe")), "%" + name.toLowerCase() + "%"))
+                    .or((root, query, criteriaBuilder) -> criteriaBuilder.like(criteriaBuilder.lower(root.get("moTa")), "%" + name.toLowerCase() + "%"));
         }
 
         return suKienRepository.findAll(specification, pageable);
