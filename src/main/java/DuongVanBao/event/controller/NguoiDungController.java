@@ -25,7 +25,7 @@ public class NguoiDungController {
     @PostMapping("/change-information")
     public ResponseEntity<?> changeInformation(@ModelAttribute ChangeInformationRequest request) {
         NguoiDung nguoiDung = SecurityUtils.getCurrentUser();
-        nguoiDungService.changeInformation(nguoiDung.getMaNguoiDung(), request);
+        nguoiDung =  nguoiDungService.changeInformation(nguoiDung.getMaNguoiDung(), request);
 
         return ResponseEntity.ok(SuccessResponse.withMessage(
                 nguoiDung,

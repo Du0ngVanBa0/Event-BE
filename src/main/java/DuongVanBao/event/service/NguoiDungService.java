@@ -15,7 +15,7 @@ public interface NguoiDungService extends BaseService<NguoiDung, String> {
     NguoiDungResponse updateUser(String maNguoiDung, NguoiDungUpdateRequest request);
     NguoiDungResponse updateRole(String maNguoiDung, Role vaiTro);
     void deleteUser(String maNguoiDung);
-    public void changeInformation(String maNguoiDung, ChangeInformationRequest request);
+    NguoiDung changeInformation(String maNguoiDung, ChangeInformationRequest request);
         Page<NguoiDungResponse> findPageWithFilters(
             Boolean hoatDong,
             String tenNguoiDung,
