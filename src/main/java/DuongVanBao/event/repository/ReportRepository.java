@@ -18,4 +18,9 @@ public interface ReportRepository{
     long countTongSuKienByDateRange(LocalDate tuNgay, LocalDate denNgay);
     long countSuKienChoDuyetByDateRange(LocalDate tuNgay, LocalDate denNgay);
     long countTongNguoiDungByDateRange(LocalDate tuNgay, LocalDate denNgay);
-    BigDecimal calculateDoanhThuByDateRange(LocalDate tuNgay, LocalDate denNgay);}
+    BigDecimal calculateDoanhThuByDateRange(LocalDate tuNgay, LocalDate denNgay);
+
+    List<ReportResponse.KhachHangMuaNhieu> findTopKhachHangByDateRange(LocalDate tuNgay, LocalDate denNgay, Integer limit);
+    List<ReportResponse.KhachHangMuaNhieu> findTopKhachHangBySuKien(String maSuKien, LocalDate tuNgay, LocalDate denNgay, Integer limit);
+    ReportResponse.DoanhThuSuKien getDoanhThuAndDetailsSuKien(String maSuKien);
+}

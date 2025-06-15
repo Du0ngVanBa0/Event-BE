@@ -32,4 +32,16 @@ public class ReportService {
 
         return response;
     }
+
+    public List<ReportResponse.KhachHangMuaNhieu> getTopKhachHangByDateRange(LocalDate tuNgay, LocalDate denNgay, Integer limit) {
+        return reportRepository.findTopKhachHangByDateRange(tuNgay, denNgay, limit);
+    }
+
+    public List<ReportResponse.KhachHangMuaNhieu> getTopKhachHangBySuKien(String maSuKien, LocalDate tuNgay, LocalDate denNgay, Integer limit) {
+        return reportRepository.findTopKhachHangBySuKien(maSuKien, tuNgay, denNgay, limit);
+    }
+
+    public ReportResponse.DoanhThuSuKien getDoanhThuAndDetailsSuKien(String maSuKien) {
+        return reportRepository.getDoanhThuAndDetailsSuKien(maSuKien);
+    }
 }
