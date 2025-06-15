@@ -13,24 +13,22 @@ import java.util.List;
 public class ReportService {
     private final ReportRepository reportRepository;
 
-    public ReportResponse getThongKe(Integer month, Integer year) {
-        if (month == null || year == null) {
-            LocalDate now = LocalDate.now();
-            month = now.getMonthValue();
-            year = now.getYear();
-        }
-
+    public ReportResponse getThongKeAllTime() {
         ReportResponse response = new ReportResponse();
         response.setTongSuKien(reportRepository.countTongSuKien());
         response.setTongSuKienChoDuyet(reportRepository.countSuKienChoDuyet());
         response.setTongNguoiDung(reportRepository.countTongNguoiDung());
-        response.setDoanhThuThang(reportRepository.calculateDoanhThuThang(month, year));
+        response.setDoanhThuThang(reportRepository.calculateDoanhThuAllTime());
 
-        List<ReportResponse.DanhMucPhoBien> danhMucPhoBien = reportRepository.findDanhMucPhoBien(month, year);
-        response.setDanhMucPhoBien(danhMucPhoBien);
+        return response;
+    }
 
-        List<ReportResponse.SuKienHot> suKienHot = reportRepository.findSuKienHotThang(month, year);
-        response.setSuKienHot(suKienHot);
+    public ReportResponse getThongKeByDateRange(LocalDate tuNgay, LocalDate denNgay) {
+        ReportResponse response = new ReportResponse();
+        response.setTongSuKien(reportRepository.countTongSuKienByDateRange(tuNgay, denNgay));
+        response.setTongSuKienChoDuyet(reportRepository.countSuKienChoDuyetByDateRange(tuNgay, denNgay));
+        response.setTongNguoiDung(reportRepository.countTongNguoiDungByDateRange(tuNgay, denNgay));
+        response.setDoanhThuThang(reportRepository.calculateDoanhThuByDateRange(tuNgay, denNgay));
 
         return response;
     }

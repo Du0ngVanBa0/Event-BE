@@ -183,7 +183,7 @@ public class DatVeController {
     public ResponseEntity<?> checkIn(@PathVariable String id) {
         Ve ve = veService.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy vé"));
         String maNguoiDung = SecurityUtils.getCurrentUser().getMaNguoiDung();
-        if (!SecurityUtils.hasRole("ADMIN") || !maNguoiDung.equals(ve.getLoaiVe().getSuKien().getNguoiToChuc().getMaNguoiDung())) {
+        if (SecurityUtils.hasRole("ADMIN") || maNguoiDung.equals(ve.getLoaiVe().getSuKien().getNguoiToChuc().getMaNguoiDung())) {
             return ResponseEntity.ok(SuccessResponse.withData(toVeResponse(ve)));
         } else {
             return ResponseEntity.ok(ErrorResponse.withMessage("Không tìm thấy vé"));

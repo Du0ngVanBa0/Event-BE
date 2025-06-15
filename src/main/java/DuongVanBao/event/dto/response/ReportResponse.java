@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,8 +14,6 @@ public class ReportResponse {
     private long tongSuKienChoDuyet;
     private long tongNguoiDung;
     private BigDecimal doanhThuThang;
-    private List<DanhMucPhoBien> danhMucPhoBien;
-    private List<SuKienHot> suKienHot;
 
     @Data
     @NoArgsConstructor
