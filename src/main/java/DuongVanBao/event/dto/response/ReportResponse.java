@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -15,24 +15,29 @@ public class ReportResponse {
     private long tongSuKienChoDuyet;
     private long tongNguoiDung;
     private BigDecimal doanhThuThang;
-    private List<DanhMucPhoBien> danhMucPhoBien;
-    private List<SuKienHot> suKienHot;
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class DanhMucPhoBien {
-        private String tenDanhMuc;
-        private long soSuKien;
+    public static class KhachHangMuaNhieu {
+        private String maNguoiDung;
+        private String tenHienThi;
+        private String email;
+        private String anhDaiDien;
+        private long soVe;
+        private BigDecimal tongTien;
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SuKienHot {
-        private String tenSuKien;
+    public static class DoanhThuSuKien {
         private String maSuKien;
-        private long soVeBan;
-        private BigDecimal doanhThu;
+        private String tieuDe;
+        private LocalDateTime thoiGianBatDau;
+        private LocalDateTime thoiGianKetThuc;
+        private BigDecimal tongDoanhThu;
+        private long soVeDaBan;
+        private long soVeConLai;
     }
 }

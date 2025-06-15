@@ -129,7 +129,7 @@ public class NguoiDungServiceImpl extends BaseServiceImpl<NguoiDung, String> imp
     }
 
     @Override
-    public void changeInformation(String maNguoiDung, ChangeInformationRequest request) {
+    public NguoiDung changeInformation(String maNguoiDung, ChangeInformationRequest request) {
         NguoiDung nguoiDung = nguoiDungRepository.findByMaNguoiDung(maNguoiDung)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
 
@@ -154,6 +154,7 @@ public class NguoiDungServiceImpl extends BaseServiceImpl<NguoiDung, String> imp
         }
 
         nguoiDungRepository.save(nguoiDung);
+        return nguoiDung;
     }
     @Transactional
     @Override

@@ -13,25 +13,35 @@ import java.util.List;
 public class ReportService {
     private final ReportRepository reportRepository;
 
-    public ReportResponse getThongKe(Integer month, Integer year) {
-        if (month == null || year == null) {
-            LocalDate now = LocalDate.now();
-            month = now.getMonthValue();
-            year = now.getYear();
-        }
-
+    public ReportResponse getThongKeAllTime() {
         ReportResponse response = new ReportResponse();
         response.setTongSuKien(reportRepository.countTongSuKien());
         response.setTongSuKienChoDuyet(reportRepository.countSuKienChoDuyet());
         response.setTongNguoiDung(reportRepository.countTongNguoiDung());
-        response.setDoanhThuThang(reportRepository.calculateDoanhThuThang(month, year));
-
-        List<ReportResponse.DanhMucPhoBien> danhMucPhoBien = reportRepository.findDanhMucPhoBien(month, year);
-        response.setDanhMucPhoBien(danhMucPhoBien);
-
-        List<ReportResponse.SuKienHot> suKienHot = reportRepository.findSuKienHotThang(month, year);
-        response.setSuKienHot(suKienHot);
+        response.setDoanhThuThang(reportRepository.calculateDoanhThuAllTime());
 
         return response;
+    }
+
+    public ReportResponse getThongKeByDateRange(LocalDate tuNgay, LocalDate denNgay) {
+        ReportResponse response = new ReportResponse();
+        response.setTongSuKien(reportRepository.countTongSuKienByDateRange(tuNgay, denNgay));
+        response.setTongSuKienChoDuyet(reportRepository.countSuKienChoDuyetByDateRange(tuNgay, denNgay));
+        response.setTongNguoiDung(reportRepository.countTongNguoiDungByDateRange(tuNgay, denNgay));
+        response.setDoanhThuThang(reportRepository.calculateDoanhThuByDateRange(tuNgay, denNgay));
+
+        return response;
+    }
+
+    public List<ReportResponse.KhachHangMuaNhieu> getTopKhachHangByDateRange(LocalDate tuNgay, LocalDate denNgay, Integer limit) {
+        return reportRepository.findTopKhachHangByDateRange(tuNgay, denNgay, limit);
+    }
+
+    public List<ReportResponse.KhachHangMuaNhieu> getTopKhachHangBySuKien(String maSuKien, LocalDate tuNgay, LocalDate denNgay, Integer limit) {
+        return reportRepository.findTopKhachHangBySuKien(maSuKien, tuNgay, denNgay, limit);
+    }
+
+    public ReportResponse.DoanhThuSuKien getDoanhThuAndDetailsSuKien(String maSuKien) {
+        return reportRepository.getDoanhThuAndDetailsSuKien(maSuKien);
     }
 }
