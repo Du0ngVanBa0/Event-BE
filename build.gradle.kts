@@ -24,6 +24,7 @@ repositories {
 }
 
 dependencies {
+	implementation("software.amazon.awssdk:s3:2.31.68")
 	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
