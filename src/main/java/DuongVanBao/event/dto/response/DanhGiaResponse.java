@@ -10,4 +10,5 @@ public class DanhGiaResponse {
     private Double diemDanhGia;
     private LocalDateTime ngayTao;
     private String hoTenNguoiDung;
+    private String anhDaiDienNguoiDung;
 }

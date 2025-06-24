@@ -1,5 +1,6 @@
 package DuongVanBao.event.controller;
 
+import DuongVanBao.event.dto.message.DanhGiaMessage;
 import DuongVanBao.event.dto.request.DanhGiaRequest;
 import DuongVanBao.event.dto.response.DanhGiaResponse;
 import DuongVanBao.event.dto.response.SuccessResponse;
@@ -9,6 +10,7 @@ import DuongVanBao.event.service.SuKienService;
 import DuongVanBao.event.util.SecurityUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 public class DanhGiaController {
     private final DanhGiaService danhGiaService;
     private final SuKienService suKienService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @GetMapping
     public ResponseEntity<?> getReviews(@PathVariable String maSuKien, Pageable pageable) {
@@ -53,10 +56,15 @@ public class DanhGiaController {
         danhGia.setNguoiDung(nguoiDung);
         danhGia.setNoiDung(request.getNoiDung());
         danhGia.setDiemDanhGia(request.getDiemDanhGia());
-
         danhGia = danhGiaService.save(danhGia);
-        
-        return ResponseEntity.ok(SuccessResponse.withData(toDanhGiaResponse(danhGia)));
+
+        DanhGiaResponse response = toDanhGiaResponse(danhGia);
+        messagingTemplate.convertAndSend(
+                "/topic/events/" + maSuKien + "/reviews",
+                new DanhGiaMessage("NEW_REVIEW", response)
+        );
+
+        return ResponseEntity.ok(SuccessResponse.withData(response));
     }
 
     private DanhGiaResponse toDanhGiaResponse(DanhGia danhGia) {
@@ -66,6 +74,7 @@ public class DanhGiaController {
         response.setDiemDanhGia(danhGia.getDiemDanhGia());
         response.setNgayTao(danhGia.getNgayTao());
         response.setHoTenNguoiDung(danhGia.getNguoiDung().getTenHienThi());
+        response.setAnhDaiDienNguoiDung(danhGia.getNguoiDung().getAnhDaiDien());
         return response;
     }
 }
