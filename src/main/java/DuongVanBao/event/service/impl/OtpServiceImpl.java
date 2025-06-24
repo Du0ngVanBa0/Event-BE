@@ -48,7 +48,7 @@ public class OtpServiceImpl implements OtpService {
         Otp otp = Otp.builder()
                 .nguoiDung(nguoiDung)
                 .maXacThuc(otpCode)
-                .thoiGianTao(now)
+                .ngayTao(now)
                 .thoiGianHetHan(now.plusMinutes(OTP_EXPIRATION_MINUTES))
                 .loaiOtp(otpType)
                 .daXacThuc(false)
@@ -73,7 +73,7 @@ public class OtpServiceImpl implements OtpService {
             throw new RuntimeException("Mã OTP đã được xác thực, không thể gửi lại");
         }
 
-        LocalDateTime lastSentTime = existingOtp.getThoiGianTao();
+        LocalDateTime lastSentTime = existingOtp.getNgayTao();
         if (lastSentTime.plusMinutes(1).isAfter(now)) {
             long secondsToWait = java.time.Duration.between(now, lastSentTime.plusMinutes(1)).getSeconds();
             throw new RuntimeException("Vui lòng đợi " + secondsToWait + " giây nữa để gửi lại OTP");
@@ -81,7 +81,7 @@ public class OtpServiceImpl implements OtpService {
 
         String newOtpCode = generateRandomOtp();
         existingOtp.setMaXacThuc(newOtpCode);
-        existingOtp.setThoiGianTao(now);
+        existingOtp.setNgayTao(now);
         existingOtp.setThoiGianHetHan(now.plusMinutes(OTP_EXPIRATION_MINUTES));
         existingOtp.setDaXacThuc(false);
         existingOtp.setThoiGianXacThuc(null);

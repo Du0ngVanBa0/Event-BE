@@ -26,7 +26,7 @@ public class Otp extends BaseModel {
     private String maXacThuc;
 
     @Column(nullable = false)
-    private LocalDateTime thoiGianTao;
+    private LocalDateTime ngayTao;
 
     @Column(nullable = false)
     private LocalDateTime thoiGianHetHan;
