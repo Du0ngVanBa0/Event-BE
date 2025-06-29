@@ -8,7 +8,7 @@ import DuongVanBao.event.dto.response.SuccessResponse;
 import DuongVanBao.event.model.entity.*;
 import DuongVanBao.event.repository.KhuVucRepository;
 import DuongVanBao.event.service.*;
-import DuongVanBao.event.util.FileUtil;
+import DuongVanBao.event.util.AmazonS3Util;
 import DuongVanBao.event.util.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class SuKienController implements BaseController<EventRequest, String> {
     private final DanhMucSuKienService danhMucService;
     private final LoaiVeService loaiVeService;
     private final KhuVucRepository khuVucRepository;
-    private final FileUtil fileUtil;
+    private final AmazonS3Util fileUtil;
 
     @Override
     public ResponseEntity<?> getAll() {

@@ -24,10 +24,12 @@ repositories {
 }
 
 dependencies {
+	implementation("software.amazon.awssdk:s3:2.31.68")
 	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation("org.springframework.boot:spring-boot-starter-websocket:3.5.3")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.json:json:20231013")
 	compileOnly("org.projectlombok:lombok")

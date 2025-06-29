@@ -5,11 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.UUID;
-
 @Data
 @Entity
-@Table(name = "danhGia")
 @EqualsAndHashCode(callSuper = true)
 public class DanhGia extends BaseModel {
     @Id

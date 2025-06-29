@@ -9,7 +9,7 @@ import DuongVanBao.event.model.entity.NguoiDung;
 import DuongVanBao.event.repository.NguoiDungRepository;
 import DuongVanBao.event.repository.OtpRepository;
 import DuongVanBao.event.service.NguoiDungService;
-import DuongVanBao.event.util.FileUtil;
+import DuongVanBao.event.util.AmazonS3Util;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -27,9 +27,9 @@ public class NguoiDungServiceImpl extends BaseServiceImpl<NguoiDung, String> imp
     private final PasswordEncoder passwordEncoder;
     private final NguoiDungMapper nguoiDungMapper;
     private final OtpRepository otpRepository;
-    private final FileUtil fileUtil;
+    private final AmazonS3Util fileUtil;
 
-    public NguoiDungServiceImpl(NguoiDungRepository repository, PasswordEncoder passwordEncoder, NguoiDungMapper nguoiDungMapper, OtpRepository otpRepository, FileUtil fileUtil) {
+    public NguoiDungServiceImpl(NguoiDungRepository repository, PasswordEncoder passwordEncoder, NguoiDungMapper nguoiDungMapper, OtpRepository otpRepository, AmazonS3Util fileUtil) {
         super(repository);
         nguoiDungRepository = repository;
         this.passwordEncoder = passwordEncoder;
