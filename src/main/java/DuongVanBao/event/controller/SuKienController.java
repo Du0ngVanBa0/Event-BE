@@ -429,6 +429,12 @@ public class SuKienController implements BaseController<EventRequest, String> {
         EventResponse response = new EventResponse();
         BeanUtils.copyProperties(suKien, response);
 
+        EventResponse.NguoiDungResponse nd = new EventResponse.NguoiDungResponse();
+        nd.setTenHienThi(suKien.getNguoiToChuc().getTenHienThi());
+        nd.setEmail(suKien.getNguoiToChuc().getEmail());
+        nd.setMaNguoiDung(suKien.getNguoiToChuc().getMaNguoiDung());
+        response.setNguoiToChuc(nd);
+
         EventResponse.DiaDiemResponse diaDiemResponse = new EventResponse.DiaDiemResponse();
         DiaDiem diaDiem = suKien.getDiaDiem();
         diaDiemResponse.setMaDiaDiem(diaDiem.getMaDiaDiem());

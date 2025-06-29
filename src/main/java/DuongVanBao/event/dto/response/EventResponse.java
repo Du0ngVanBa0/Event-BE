@@ -18,6 +18,7 @@ public class EventResponse extends BaseModel {
     private LocalDateTime ngayDongBanVe;
     private String anhBia;
     private boolean hoatDong;
+    private NguoiDungResponse nguoiToChuc;
     private DiaDiemResponse diaDiem;
     private List<DanhMucResponse> danhMucs;
     private List<LoaiVeResponse> loaiVes;
@@ -39,6 +40,13 @@ public class EventResponse extends BaseModel {
     public static class DanhMucResponse {
         private String maDanhMuc;
         private String tenDanhMuc;
+    }
+
+    @Data
+    public static class NguoiDungResponse {
+        private String maNguoiDung;
+        private String tenHienThi;
+        private String email;
     }
 
     @Data
